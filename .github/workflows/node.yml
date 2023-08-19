@@ -6,11 +6,19 @@ on: # trigger events for Pipeline
     branches: [master]
 jobs:
   build:
+    env:
+      CI: true # let Create-React-App knows that we are in CI env => react test won't hang
+    strategy:
+      matrix:
+        node-version: [16.x, 18.x]
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v2
+      - name: Checkout to Master branch for latest code
+        uses: actions/checkout@v2
+      - name: Set up Node.js version ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
         with:
-          node-version: "18"
+          node-version: ${{ matrix.node-version }}
       - run: npm install
       - run: npm run build --prefix client
+      - run: npm test
